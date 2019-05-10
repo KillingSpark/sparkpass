@@ -1,0 +1,10 @@
+[package]
+name = "sparkpass"
+version = "0.1.0"
+authors = ["Moritz Borcherding <moritz.borcherding@web.de>"]
+edition = "2018"
+
+[dependencies]
+openssl = "0.10.22"
+base64 = "0.10.1"
+argparse = "0.2.2"
