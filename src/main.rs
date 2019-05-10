@@ -392,9 +392,9 @@ fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
     for (e, dir) in entries {
         let clear_entry = transform::retransform_entry(enc_params, &(e[..]));
         if dir {
-            print!("DIR\t")
+            print!("DIR ")
         }else{
-            print!("ENT\t")
+            print!("ENT ")
         }
         println!("{}", clear_entry);
     }
@@ -489,17 +489,17 @@ fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::Encry
 
     for (e, dir) in filtered {
     if dir {
-            print!("DIR\t")
+            print!("DIR ")
         }else{
-            print!("ENT\t")
+            print!("ENT ")
         }
         println!("{}", e);
     }
 }
 
 fn cmd_add(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
-    if opts.args.len() != 1 {
-        println!("Too many arguments. Want: 'path_new'  Got: {}", opts.args.len());
+    if opts.args.len() != 2 {
+        println!("Too many arguments. Want: 'path_new, content'  Got: {}", opts.args.len());
         return;
     }
 
