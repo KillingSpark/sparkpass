@@ -16,6 +16,8 @@ struct Options {
     key: String,
     repo: String,
     verbose: bool,
+    recursive: bool,
+    force: bool,
 }
 
 fn read_key_from_terminal() -> String {
@@ -31,6 +33,8 @@ fn main() {
         key: String::new(),
         repo: String::new(),
         verbose: false,
+        recursive: false,
+        force: false,
     };
 
     let mut command = String::new();
@@ -51,8 +55,16 @@ fn main() {
             .add_option(&["--verbose", "-v"], StoreTrue,
             "More print outs");
 
+        ap.refer(&mut options.force)
+            .add_option(&["--force", "-f"], StoreTrue,
+            "Force overwrites for copy/move/generate/add");
+
+        ap.refer(&mut options.recursive)
+            .add_option(&["--recursive", "-r"], StoreTrue,
+            "Remove contents of directories");
+
         ap.refer(&mut options.repo)
-            .add_option(&["--repo", "-r"], Store,
+            .add_option(&["--repo", "-p"], Store,
             "Path to the repo where your keys are");
 
         ap.refer(&mut options.key)
@@ -204,7 +216,7 @@ fn cmd_move(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
 
     if opts.verbose {println!("Moving Entry: {}, To: {}", relative_path_old, relative_path_new);}
 
-    if full_path_new.exists() {
+    if full_path_new.exists() && !opts.force {
         println!("Target exists already!");
         return;
     }
@@ -224,7 +236,7 @@ fn cmd_copy(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
 
     if opts.verbose {println!("Copying Entry: {}, To: {}", relative_path_old, relative_path_new);}
 
-    if full_path_new.exists() {
+    if full_path_new.exists() && !opts.force {
         println!("Target exists already!");
         return;
     }
@@ -253,20 +265,23 @@ fn cmd_remove(opts: &Options, prefix: &path::Path , enc_params: &transform::Encr
     if full_path.is_file() {
         fs::remove_file(full_path).unwrap();
     } else if full_path.is_dir() {
-        fs::remove_dir_all(full_path).unwrap();
+        if opts.recursive {
+            fs::remove_dir_all(full_path).unwrap();
+        }else{
+            println!("Tried to remove directory without recursive flag set");
+        }
     }
 }
 
 fn cmd_generate(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
     let relative_path = prepare_entry_path(opts.args[0].as_str());
-
     
     let passwd = if opts.args.len() >= 2 {
         generate::generate_passwd(opts.args[1].trim().parse().unwrap())
     }else{
         generate::generate_passwd(64)
     };
-    add_entry(prefix, path::Path::new(relative_path), passwd.as_str(), enc_params).unwrap();
+    add_entry(prefix, path::Path::new(relative_path), passwd.as_str(), opts.force, enc_params).unwrap();
 }
 
 fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
@@ -389,19 +404,19 @@ fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::Encry
 fn cmd_add(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     let relative_path = prepare_entry_path(opts.args[0].as_str());
     if opts.verbose {println!("Adding Entry: {}, Content: {}", relative_path, opts.args[1]);}
-    add_entry(prefix, path::Path::new(relative_path), opts.args[1].as_str(), enc_params).unwrap();
+    add_entry(prefix, path::Path::new(relative_path), opts.args[1].as_str(), opts.force, enc_params).unwrap();
 }
 
-fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, enc_params: &transform::EncryptionParams) -> Result<(), String> {
+fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, overwrite: bool, enc_params: &transform::EncryptionParams) -> Result<(), String> {
     let trans_path = transform::transform_path(enc_params, p.to_str().unwrap()).join("/");
     let full_path = prefix.join(trans_path.clone());
 
-    let exists = match fs::metadata(trans_path.clone()) {
+    let exists = match fs::metadata(full_path.clone()) {
         Ok(_) => true,
         Err(_) => false,
     };
 
-    if exists {
+    if exists && !overwrite {
         return Err("Entry exists already".to_owned())
     }else{
         let full_path_dir = full_path.as_path().parent().unwrap();
