@@ -209,6 +209,11 @@ fn prepare_entry_path(path: &str) -> &str {
 }
 
 fn cmd_move(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
+    if opts.args.len() != 2 {
+        println!("Too many arguments. Want: 'old_path, new_path'  Got: {}", opts.args.len());
+        return;
+    }
+
     let relative_path_old = prepare_entry_path(opts.args[0].as_str());
     let trans_path_old = transform::transform_path(enc_params, relative_path_old);
     let full_path_old = prefix.join(trans_path_old.join("/"));
@@ -229,6 +234,11 @@ fn cmd_move(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
 }
 
 fn cmd_copy(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
+    if opts.args.len() != 2 {
+        println!("Too many arguments. Want: 'old_path, new_path'  Got: {}", opts.args.len());
+        return;
+    }
+
     let relative_path_old = prepare_entry_path(opts.args[0].as_str());
     let trans_path_old = transform::transform_path(enc_params, relative_path_old);
     let full_path_old = prefix.join(trans_path_old.join("/"));
@@ -260,6 +270,11 @@ fn cmd_copy(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
 }
 
 fn cmd_remove(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
+    if opts.args.len() != 1 {
+        println!("Too many arguments. Want: 'path'  Got: {}", opts.args.len());
+        return;
+    }
+
     let relative_path = prepare_entry_path(opts.args[0].as_str());
     if opts.verbose {println!("Removing Entry: {}", relative_path);}
 
@@ -278,6 +293,11 @@ fn cmd_remove(opts: &Options, prefix: &path::Path , enc_params: &transform::Encr
 }
 
 fn cmd_generate(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
+    if opts.args.len() != 1 {
+        println!("Too many arguments. Want: 'path'  Got: {}", opts.args.len());
+        return;
+    }
+
     let relative_path = prepare_entry_path(opts.args[0].as_str());
     
     let passwd = if opts.args.len() >= 2 {
@@ -289,6 +309,11 @@ fn cmd_generate(opts: &Options, prefix: &path::Path , enc_params: &transform::En
 }
 
 fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
+    if opts.args.len() != 1 {
+        println!("Too many arguments. Want: 'path_to_dir'  Got: {}", opts.args.len());
+        return;
+    }
+
     //check if any path needs to be appended to the prefix
     let pp = if opts.args.len() > 0 && opts.args[0].len() > 0 && opts.args[0] != "/" {
         let relative_path = prepare_entry_path(opts.args[0].as_str());
@@ -326,6 +351,11 @@ fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
 }
 
 fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
+    if opts.args.len() != 1 {
+        println!("Too many arguments. Want: 'path_to_entry'  Got: {}", opts.args.len());
+        return;
+    }
+
     let relative_path = prepare_entry_path(opts.args[0].as_str());
     let content = match show_entry(prefix, path::Path::new(relative_path), enc_params) {
         Ok(c) => c,
@@ -345,6 +375,11 @@ fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::Encrypt
 }
 
 fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
+    if opts.args.len() != 1 {
+        println!("Too many arguments. Want: 'pattern'  Got: {}", opts.args.len());
+        return;
+    }
+
     let relative_path = prepare_entry_path(opts.args[0].as_str());
 
     if opts.verbose {println!("Searching for: {}", relative_path);}
@@ -406,6 +441,11 @@ fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::Encry
 }
 
 fn cmd_add(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
+    if opts.args.len() != 1 {
+        println!("Too many arguments. Want: 'path_new'  Got: {}", opts.args.len());
+        return;
+    }
+
     let relative_path = prepare_entry_path(opts.args[0].as_str());
     if opts.verbose {println!("Adding Entry: {}, Content: {}", relative_path, opts.args[1]);}
     add_entry(prefix, path::Path::new(relative_path), opts.args[1].as_str(), opts.force, enc_params).unwrap();
