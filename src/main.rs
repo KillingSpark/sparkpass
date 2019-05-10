@@ -131,7 +131,8 @@ fn main() {
         }
 
         "grep" => {
-            panic!("Not implemented!");
+            println!("This command is currently not supported. Sorry");
+            return;
         },
 
         "find" =>  {
@@ -153,7 +154,8 @@ fn main() {
         },
 
         "edit" => {
-            panic!("Not implemented!");
+            println!("This command is currently not supported. Sorry");
+            return;
         },
 
         "generate" => {
@@ -233,7 +235,10 @@ fn cmd_move(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
         return;
     }
 
-    fs::rename(full_path_old, full_path_new).unwrap();
+    match fs::rename(full_path_old, full_path_new) {
+        Ok(_) => {},
+        Err(e) => println!("An error occured while moving: {}", e),
+    }
 }
 
 fn cmd_copy(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
@@ -263,12 +268,23 @@ fn cmd_copy(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
     }else{
         match full_path_new.parent() {
             Some(p) => {
-                fs::create_dir_all(p).unwrap();
+                match fs::create_dir_all(p){
+                    Ok(_) => {},
+                        Err(e) => {println!("An error occured while creating the needed directories: {}", e);
+                        return;
+                    },
+                }
             },
             None => {},
         };
 
-    fs::copy(full_path_old, full_path_new).unwrap();
+        match fs::copy(full_path_old, full_path_new){
+            Ok(_) => {},
+            Err(e) => {
+                println!("An error occured while copying to new location: {}", e);
+                return;
+            },
+        };
     }
 }
 
@@ -285,12 +301,26 @@ fn cmd_remove(opts: &Options, prefix: &path::Path , enc_params: &transform::Encr
     let full_path = prefix.join(trans_path.join("/"));
 
     if full_path.is_file() {
-        fs::remove_file(full_path).unwrap();
-    } else if full_path.is_dir() {
-        if opts.recursive {
-            fs::remove_dir_all(full_path).unwrap();
-        }else{
-            println!("Tried to remove directory without recursive flag set");
+        match fs::remove_file(full_path) {
+            Ok(_) => {},
+            Err(e) => {
+                println!("An error occured while removing: {}", e);
+                return;
+            },
+        }
+    } else { 
+        if full_path.is_dir() {
+            if opts.recursive {
+                match fs::remove_dir_all(full_path) {
+                    Ok(_) => {},
+                    Err(e) => {
+                        println!("An error occured while removing: {}", e);
+                        return;
+                    },
+                }
+            } else {
+                println!("Tried to remove directory without recursive flag set");
+            }
         }
     }
 }
@@ -304,15 +334,29 @@ fn cmd_generate(opts: &Options, prefix: &path::Path , enc_params: &transform::En
     let relative_path = prepare_entry_path(opts.args[0].as_str());
     
     let passwd = if opts.args.len() >= 2 {
-        generate::generate_passwd(opts.args[1].trim().parse().unwrap())
+        let length = match opts.args[1].trim().parse() {
+            Ok(i) => i,
+            Err(e) => {
+                println!("Error while converting argument to number: {}", e);
+                return;
+            },
+        };
+        generate::generate_passwd(length)
     }else{
         generate::generate_passwd(64)
     };
-    add_entry(prefix, path::Path::new(relative_path), passwd.as_str(), opts.force, enc_params).unwrap();
+
+    match add_entry(prefix, path::Path::new(relative_path), passwd.as_str(), opts.force, enc_params) {
+        Ok(_) => {},
+        Err(e) => {
+            println!("An error occured while adding the entry: {}", e);
+            return;
+        },
+    }
 }
 
 fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
-    if opts.args.len() != 1 {
+    if opts.args.len() > 1 {
         println!("Too many arguments. Want: 'path_to_dir'  Got: {}", opts.args.len());
         return;
     }
@@ -333,7 +377,10 @@ fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
 
     let entries = match get_all_entries_in_path(full_path){
         Ok(vec) => vec,
-        Err(err) => panic!(err),
+        Err(err) => {
+            println!("An error occured while listing entries: {}", err);
+            return;
+        },
     };
 
     if entries.len() == 0 {
@@ -378,12 +425,16 @@ fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::Encrypt
 }
 
 fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
-    if opts.args.len() != 1 {
+    if opts.args.len() > 1 {
         println!("Too many arguments. Want: 'pattern'  Got: {}", opts.args.len());
         return;
     }
 
-    let relative_path = prepare_entry_path(opts.args[0].as_str());
+    let relative_path = if opts.args.len() == 0 {
+        ""
+    } else {
+        prepare_entry_path(opts.args[0].as_str())
+    };
 
     if opts.verbose {println!("Searching for: {}", relative_path);}
     let pp = path::Path::new(relative_path);
@@ -414,7 +465,10 @@ fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::Encry
     if opts.verbose {println!("Searching in: {}", trans_path_dir.to_str().unwrap());}
     let entries = match get_all_entries_in_path(trans_path_dir){
         Ok(vec) => vec,
-        Err(err) => panic!(err),
+        Err(err) => {
+            println!("An error occured while listing entries: {}", err);
+            return;
+        },
     };
 
 
@@ -451,7 +505,15 @@ fn cmd_add(opts: &Options, prefix: &path::Path, enc_params: &transform::Encrypti
 
     let relative_path = prepare_entry_path(opts.args[0].as_str());
     if opts.verbose {println!("Adding Entry: {}, Content: {}", relative_path, opts.args[1]);}
-    add_entry(prefix, path::Path::new(relative_path), opts.args[1].as_str(), opts.force, enc_params).unwrap();
+
+
+    match add_entry(prefix, path::Path::new(relative_path), opts.args[1].as_str(), opts.force, enc_params){
+        Ok(_) => {},
+        Err(e) => {
+            println!("An error occured while adding the entry: {}", e);
+            return;
+        },
+    }
 }
 
 fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, overwrite: bool, enc_params: &transform::EncryptionParams) -> Result<(), String> {
@@ -467,11 +529,21 @@ fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, overwrite: boo
         return Err("Entry exists already".to_owned())
     }else{
         let full_path_dir = full_path.as_path().parent().unwrap();
-        fs::create_dir_all(full_path_dir).unwrap();
+        match fs::create_dir_all(full_path_dir) {
+            Ok(_) => {},
+            Err(_) => {
+                return Err("An error occured while creating necessary parent directories".to_owned());
+            }
+        }
     }
 
     let trans_content = transform::transform_entry(enc_params, content);
-    fs::write(full_path, trans_content).unwrap();
+    match fs::write(full_path, trans_content) {
+        Ok(_) => {},
+        Err(_) => {
+            return Err("An error occured while writing the content to the file".to_owned());
+        }
+    }
 
     return Ok(())
 }
@@ -490,10 +562,17 @@ fn show_entry(prefix: &path::Path, p: &path::Path, enc_params: &transform::Encry
     };
 
     if !exists {
-        return Err("Entry does not exist".to_owned())
+        return Err("Entry does not exist".to_owned());
     }
 
-    let res = fs::read(full_path).unwrap();
+    let res = match fs::read(full_path) {
+        Ok(r) => r,
+        Err(_) => {
+            return Err("An error occured while reading the entry from the file".to_owned());
+        }
+    };
+
+
     let content = str::from_utf8(res.as_slice()).unwrap().to_owned();
     let clear_content = transform::retransform_entry(enc_params, content.as_str());
 
