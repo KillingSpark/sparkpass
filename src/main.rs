@@ -326,8 +326,8 @@ fn cmd_remove(opts: &Options, prefix: &path::Path , enc_params: &transform::Encr
 }
 
 fn cmd_generate(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
-    if opts.args.len() != 1 {
-        println!("Too many arguments. Want: 'path'  Got: {}", opts.args.len());
+    if opts.args.len() > 2 {
+        println!("Too many arguments. Want: 'path, [length]'  Got: {}", opts.args.len());
         return;
     }
 
@@ -366,14 +366,14 @@ fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::Encryp
         let relative_path = prepare_entry_path(opts.args[0].as_str());
 
         let trans_path_tmp = transform::transform_path(enc_params, relative_path);
-        prefix.join(trans_path_tmp.join(""))
+        prefix.join(trans_path_tmp.join("/"))
     } else{
         prefix.to_path_buf()
     };
 
     let full_path = pp.as_path();
     
-    if opts.verbose {println!("Searching in: {}", full_path.to_str().unwrap());}
+    if opts.verbose {println!("Listing in: {}", full_path.to_str().unwrap());}
 
     let entries = match get_all_entries_in_path(full_path){
         Ok(vec) => vec,
