@@ -1,11 +1,14 @@
 mod transform;
 mod generate;
+
+extern crate shellexpand;
 extern crate argparse;
 
 use std::path;
 use std::fs;
 use std::str;
 use std::io;
+
 
 use argparse::{ArgumentParser, Store, StoreTrue, Collect};
 
@@ -104,7 +107,8 @@ fn main() {
     }
 
     if options.repo == "" {
-        options.repo = "~/.sparkpass/".to_owned();
+        let home = std::env::var("HOME").unwrap();
+        options.repo = path::Path::new(home.as_str()).join(".sparkpass/".to_owned()).to_str().unwrap().to_owned();
         if options.verbose {
             println!("Repo not specified (use either SPARKPASS_REPO or --repo/-r), falling back to default {}", options.repo)
         }
