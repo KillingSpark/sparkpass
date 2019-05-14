@@ -39,7 +39,7 @@ fn print_tree(tree: &TreeNode, prefix: String, last: bool, level: i32) {
                     if !last {
                         prefix_new.push_str("│   ");
                     }else{
-                        prefix_new.push_str("   ");
+                        prefix_new.push_str("    ");
                     }
                 }
 
