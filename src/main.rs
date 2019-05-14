@@ -124,10 +124,10 @@ fn main() {
 
     match &(command)[..] {
         "ls" => {
-            cmd_list(&options, repopath, &enc_params);
+            cmd_list_tree(&options, repopath, &enc_params);
         },
         "list" => {
-            cmd_list(&options, repopath, &enc_params);
+            cmd_list_tree(&options, repopath, &enc_params);
         }
 
         "grep" => {
@@ -355,6 +355,100 @@ fn cmd_generate(opts: &Options, prefix: &path::Path , enc_params: &transform::En
     }
 }
 
+fn print_tree(tree: &TreeNode, prefix: String, last: bool, level: i32) {
+     match tree {
+        TreeNode::Leaf(name) => {
+            if level > 0 {
+                print!("{}", prefix);
+
+                if last {
+                    println!("└── {}", name);
+                }else{
+                    println!("├── {}", name);
+                }
+            }else{
+                println!("{}", name);
+            }
+        },
+        TreeNode::Node(name, children) => {
+            if level != 0 { 
+                print!("{}", prefix);
+                if last {
+                    println!("└── {}", name);
+                }else{
+                    println!("├── {}", name);
+                }
+            }else {
+                println!("{}", name);
+            }
+
+            let mut i = 0;
+            for c in children {
+                i+=1;
+                let mut prefix_new = prefix.clone();
+                if level > 0 {
+                    if !last {
+                        prefix_new.push_str("│   ");
+                    }else{
+                        prefix_new.push_str("   ");
+                    }
+                }
+
+                if i != children.len() {
+                    print_tree(c, prefix_new, false, level+1);
+                }else{
+                    print_tree(c, prefix_new, true, level+1);
+                }
+            }
+        }
+    }
+}
+
+fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
+    if opts.args.len() > 1 {
+        println!("Too many arguments. Want: 'path_to_dir'  Got: {}", opts.args.len());
+        return;
+    }
+
+    let mut is_root = false;
+
+    //check if any path needs to be appended to the prefix
+    let pp = if opts.args.len() > 0 && opts.args[0].len() > 0 && opts.args[0] != "/" {
+        let relative_path = prepare_entry_path(opts.args[0].as_str());
+
+        let trans_path_tmp = transform::transform_path(enc_params, relative_path);
+        prefix.join(trans_path_tmp.join("/"))
+    } else{
+        is_root = true;
+        prefix.to_path_buf()
+    };
+
+    let full_path = pp.as_path();
+    
+    if opts.verbose {println!("Listing in: {}", full_path.to_str().unwrap());}
+
+    let tree = match get_tree_from_path(full_path, is_root, enc_params){
+        Ok(t) => t,
+        Err(err) => {
+            println!("An error occured while listing entries: {}", err);
+            return;
+        },
+    };
+
+    let renamed_tree = if is_root {
+        match tree {
+            TreeNode::Node(_, children) => {
+                TreeNode::Node("repo".to_owned(), children)
+            },
+            TreeNode::Leaf(_) => TreeNode::Leaf("repo".to_owned())
+        }
+    }else{
+        tree
+    };
+
+    print_tree(&renamed_tree, "".to_owned(), false, 0);
+}
+
 fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
     if opts.args.len() > 1 {
         println!("Too many arguments. Want: 'path_to_dir'  Got: {}", opts.args.len());
@@ -577,6 +671,53 @@ fn show_entry(prefix: &path::Path, p: &path::Path, enc_params: &transform::Encry
     let clear_content = transform::retransform_entry(enc_params, content.as_str());
 
     return Ok(clear_content);
+}
+
+enum TreeNode {
+    Node(String, Vec<TreeNode>),
+    Leaf(String),
+}
+
+fn get_tree_from_path(p: &path::Path, is_clear: bool, enc_params: &transform::EncryptionParams) -> Result<TreeNode, String> {
+    if p.is_file() {
+        let filename = p.file_name().unwrap().to_str().unwrap();
+        return Ok(TreeNode::Leaf(transform::retransform_entry(enc_params, filename)));
+    }
+
+    let it = match fs::read_dir(p) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Couldnt read directory".to_owned()),
+    };
+
+    let mut result = Vec::new();
+
+    for entry in it {
+        let entry = match entry {
+            Ok(e) => e,
+            Err(_) => return Err("Conversion error. Not UTF-8?".to_owned()),
+        };
+
+    
+        let entryp = &entry.path();
+        
+        match get_tree_from_path(entryp, false, enc_params) {
+            Ok(node) => {
+                result.push(node);
+                },
+            Err(e) => {
+                return Err(e);
+            },
+        }
+    }
+
+    let filename = p.file_name().unwrap().to_str().unwrap();
+
+    let dirname = if !is_clear {
+        transform::retransform_entry(enc_params, filename)
+    }else{
+        filename.to_owned()
+    };
+    return Ok(TreeNode::Node(dirname.to_owned(), result));
 }
 
 fn get_all_entries_in_path(p: &path::Path) -> Result<Vec<(String,bool)>, String> {
