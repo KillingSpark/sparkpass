@@ -1,10 +1,11 @@
+
+//main.rs deals with preparing the options and arguments to pass to the cmd_* functions
+
 extern crate shellexpand;
 extern crate argparse;
 use argparse::{ArgumentParser, Store, StoreTrue, Collect};
 
 use std::path;
-use std::fs;
-use std::str;
 use std::io;
 use openssl::sha::sha256;
 
@@ -30,7 +31,7 @@ use cmd_search::cmd_search;
 mod cmd_show;
 use cmd_show::cmd_show;
 
-use util::{Options, prepare_entry_path, get_all_entries_in_path};
+use util::Options;
 
 
 

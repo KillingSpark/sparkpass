@@ -1,4 +1,4 @@
-use crate::util::{TreeNode, Options, prepare_entry_path,  get_tree_from_path, get_all_entries_in_path};
+use crate::util::{TreeNode, Options, prepare_entry_path,  get_tree_from_path};
 use crate::transform;
 
 use std::path;
@@ -98,47 +98,47 @@ pub fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transfor
     print_tree(&renamed_tree, "".to_owned(), false, 0);
 }
 
-fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
-    if opts.args.len() > 1 {
-        println!("Too many arguments. Want: 'path_to_dir'  Got: {}", opts.args.len());
-        return;
-    }
-
-    //check if any path needs to be appended to the prefix
-    let pp = if opts.args.len() > 0 && opts.args[0].len() > 0 && opts.args[0] != "/" {
-        let relative_path = prepare_entry_path(opts.args[0].as_str());
-
-        let trans_path_tmp = transform::transform_path(enc_params, relative_path);
-        prefix.join(trans_path_tmp.join("/"))
-    } else{
-        prefix.to_path_buf()
-    };
-
-    let full_path = pp.as_path();
-    
-    if opts.verbose {println!("Listing in: {}", full_path.to_str().unwrap());}
-
-    let entries = match get_all_entries_in_path(full_path){
-        Ok(vec) => vec,
-        Err(err) => {
-            println!("An error occured while listing entries: {}", err);
-            return;
-        },
-    };
-
-    if entries.len() == 0 {
-        if opts.verbose {println!("No entries found")};
-        return;
-    }
-
-    if opts.verbose {println!("Found entries:");}
-    for (e, dir) in entries {
-        let clear_entry = transform::retransform_entry(enc_params, &(e[..]));
-        if dir {
-            print!("DIR ")
-        }else{
-            print!("ENT ")
-        }
-        println!("{}", clear_entry);
-    }
-}
+//fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
+//    if opts.args.len() > 1 {
+//        println!("Too many arguments. Want: 'path_to_dir'  Got: {}", opts.args.len());
+//        return;
+//    }
+//
+//    //check if any path needs to be appended to the prefix
+//    let pp = if opts.args.len() > 0 && opts.args[0].len() > 0 && opts.args[0] != "/" {
+//        let relative_path = prepare_entry_path(opts.args[0].as_str());
+//
+//        let trans_path_tmp = transform::transform_path(enc_params, relative_path);
+//        prefix.join(trans_path_tmp.join("/"))
+//    } else{
+//        prefix.to_path_buf()
+//    };
+//
+//    let full_path = pp.as_path();
+//    
+//    if opts.verbose {println!("Listing in: {}", full_path.to_str().unwrap());}
+//
+//    let entries = match get_all_entries_in_path(full_path){
+//        Ok(vec) => vec,
+//        Err(err) => {
+//            println!("An error occured while listing entries: {}", err);
+//            return;
+//        },
+//    };
+//
+//    if entries.len() == 0 {
+//        if opts.verbose {println!("No entries found")};
+//        return;
+//    }
+//
+//    if opts.verbose {println!("Found entries:");}
+//    for (e, dir) in entries {
+//        let clear_entry = transform::retransform_entry(enc_params, &(e[..]));
+//        if dir {
+//            print!("DIR ")
+//        }else{
+//            print!("ENT ")
+//        }
+//        println!("{}", clear_entry);
+//    }
+//}
