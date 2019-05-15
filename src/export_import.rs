@@ -57,7 +57,7 @@ pub fn cmd_export(opts: &Options, prefix: &std::path::Path ,enc_params: &transfo
     let list = build_entry_list(&renamed_tree, "".to_owned());
 
     match opts.args[0].as_str() {
-        "keepass_csv" => {
+        "csv" => {
             let p = std::path::Path::new(opts.args[1].as_str());
             export_to_csv(list, prefix, p, enc_params).unwrap();
         }
