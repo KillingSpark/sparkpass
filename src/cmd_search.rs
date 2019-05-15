@@ -66,6 +66,14 @@ pub fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::E
     }
     if opts.verbose {println!("Found Entries:");}
 
+    if filtered.len() == 1 {
+        let (_,dir) = &filtered[0];
+        if *dir {
+            crate::cmd_list::cmd_list_tree(opts, prefix, enc_params)
+        }
+        return;
+    }
+
     for (e, dir) in filtered {
     if dir {
             print!("DIR ")
