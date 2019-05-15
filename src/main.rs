@@ -31,6 +31,9 @@ use cmd_search::cmd_search;
 mod cmd_show;
 use cmd_show::cmd_show;
 
+mod export_import;
+use export_import::{cmd_import, cmd_export};
+
 use util::Options;
 
 
@@ -203,6 +206,16 @@ fn main() {
             println!("######         No.         ##########");
             println!("#####################################");
             return;
+        }
+
+        ////// Commands special to sparkpass
+        
+        "import" => {
+            cmd_import(&options, repopath, &enc_params);
+        }
+
+        "export" => {
+            cmd_export(&options, repopath, &enc_params);
         }
 
         _ => {
