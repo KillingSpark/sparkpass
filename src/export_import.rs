@@ -95,22 +95,23 @@ fn import_from_keepass_csv(prefix: &std::path::Path, p: &std::path::Path, enc_pa
         let url = &record[3];
         let comment = &record[4];
 
+        let mut content = String::new();
+        content.push_str(passwd);
+        content.push('\n');
+        content.push_str(name);
+        content.push('\n');
+        content.push_str(url);
+        content.push('\n');
+        content.push_str(acc);
+        content.push('\n');
+        content.push_str(comment);
+        content.push('\n');
+
         let mut entry = String::from(url);
         entry.push_str("/");
         entry.push_str(acc);
 
-        let mut name_entry = entry.clone();
-        name_entry.push_str("/login_name");
-
-        let mut pass_entry = entry.clone();
-        pass_entry.push_str("/password");
-
-
-        match add_entry(prefix, std::path::Path::new(name_entry.as_str()), name, false, enc_params) {
-            Ok(_) => {},
-            Err(e) => return Err(e),
-        }
-         match add_entry(prefix, std::path::Path::new(pass_entry.as_str()), passwd, false, enc_params) {
+        match add_entry(prefix, std::path::Path::new(entry.as_str()), content.as_str(), false, enc_params) {
             Ok(_) => {},
             Err(e) => return Err(e),
         }

@@ -53,7 +53,7 @@ fn main() {
         verbose: false,
         recursive: false,
         force: false,
-        line: -1,
+        line: 0,
     };
 
     let mut command = String::new();

@@ -22,7 +22,7 @@ pub fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::Enc
 
     let lines: Vec<&str> = content.split("\n").collect();
     let idx: usize = opts.line as usize;
-    if idx >= lines.len() {
+    if opts.line >= 0 && idx >= lines.len() {
         println!("Line too big. Given: {}, max line in entry: {}", idx, lines.len());
         return;
     }
