@@ -11,7 +11,7 @@ pub fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::Enc
     }
 
     let relative_path = prepare_entry_path(opts.args[0].as_str());
-    let content = match show_entry(prefix, path::Path::new(relative_path), enc_params) {
+    let mut content = match show_entry(prefix, path::Path::new(relative_path), enc_params) {
         Ok(c) => c,
         Err(_) => {
             //entry doesnt exist. Search for it instead
@@ -19,6 +19,16 @@ pub fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::Enc
             return;
         },
     };
+
+    let lines: Vec<&str> = content.split("\n").collect();
+    let idx: usize = opts.line as usize;
+    if idx >= lines.len() {
+        println!("Line too big. Given: {}, max line in entry: {}", idx, lines.len());
+        return;
+    }
+    if opts.line >= 0 {
+        content = lines[idx].to_owned();
+    }
 
     if opts.verbose {println!("Showing entry: {}", relative_path);}
     if opts.verbose {

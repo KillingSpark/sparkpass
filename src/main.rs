@@ -53,6 +53,7 @@ fn main() {
         verbose: false,
         recursive: false,
         force: false,
+        line: -1,
     };
 
     let mut command = String::new();
@@ -84,6 +85,10 @@ fn main() {
         ap.refer(&mut options.repo)
             .add_option(&["--repo", "-p"], Store,
             "Path to the repo where your keys are");
+
+        ap.refer(&mut options.line)
+            .add_option(&["--line", "-l"], Store,
+            "Specify which line of  multiline file you want to show. If set to -1 all lines will be printed. Default is line 0.");
 
         ap.refer(&mut options.key)
             .add_option(&["--key", "-k"], Store,

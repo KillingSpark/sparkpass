@@ -10,6 +10,7 @@ pub struct Options {
     pub verbose: bool,
     pub recursive: bool,
     pub force: bool,
+    pub line: i32,
 }
 
 pub enum TreeNode {
