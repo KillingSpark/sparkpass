@@ -1,73 +1,7 @@
-use crate::util::{Options, prepare_entry_path, get_all_entries_in_path, get_tree_from_path, print_tree, TreeNode};
+use crate::util::{Options, prepare_entry_path, get_all_entries_in_path, get_tree_from_path, print_tree, flatten_tree, sort_tree_leveshtein};
 use crate::transform;
 
-extern crate levenshtein;
-use levenshtein::levenshtein;
-
 use std::path;
-
-fn copy_tree_node(tree: &TreeNode) -> TreeNode {
-    match tree {
-        TreeNode::Leaf(s) => TreeNode::Leaf(s.to_string()),
-        TreeNode::Node(s, children) => {
-            let mut newchildren = Vec::new();
-            for c in children {
-                newchildren.push(copy_tree_node(c));
-            }
-
-            TreeNode::Node(s.to_string(), newchildren)
-        }
-    }
-}
-
-pub fn sort_tree_leveshtein(tree: &TreeNode, words: Vec<&str>) -> TreeNode {
-    if words.len() == 0 {
-        return copy_tree_node(tree);
-    }
-
-    match tree {
-        TreeNode::Leaf(s) => TreeNode::Leaf(s.to_string()),
-        TreeNode::Node(s, children) => {
-            let mut newwords = words.clone();
-            newwords.remove(0);
-
-            let mut newchildren = Vec::new();
-            for c in children {
-                let newc = sort_tree_leveshtein(c, newwords.clone());
-                newchildren.push(copy_tree_node(&newc));
-            }
-
-            newchildren.sort_by(|a,b| {
-                let astr = match a {
-                    TreeNode::Node(s,_) => s,
-                    TreeNode::Leaf(s) => s
-                };
-                let bstr = match b {
-                    TreeNode::Node(s,_) => s,
-                    TreeNode::Leaf(s) => s
-                };
-
-                if astr.contains(words[0]) && !bstr.starts_with(words[0]) {
-                    return std::cmp::Ordering::Less;
-                }
-
-                if bstr.contains(words[0]) && !astr.starts_with(words[0]) {
-                    return std::cmp::Ordering::Greater;
-                }
-
-                let aleven = levenshtein(astr, words[0]);
-                let bleven = levenshtein(bstr, words[0]);
-
-                let aleven_norm = ((aleven as f64) * 1000.0  / (astr.len() as f64)) as usize;
-                let bleven_norm = ((bleven as f64) * 1000.0 / (bstr.len() as f64)) as usize;
-
-                aleven_norm.cmp(&bleven_norm)
-            });
-
-            TreeNode::Node(s.to_string(), newchildren)
-        }
-    }
-}
 
 pub fn cmd_search_fuzzy (opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() > 1 {
@@ -86,7 +20,14 @@ pub fn cmd_search_fuzzy (opts: &Options, prefix: &path::Path, enc_params: &trans
 
     let sorted_tree = sort_tree_leveshtein(&tree, words);
 
-    print_tree(&sorted_tree, "".to_owned(), false, 0);        
+    if opts.show_tree {
+        print_tree(&sorted_tree, "".to_owned(), false, 0); 
+    }else{
+        let vec = flatten_tree(&sorted_tree, "".to_owned());
+        for e in vec {
+            println!("{}", e);
+        }
+    }       
 }
 
 pub fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {

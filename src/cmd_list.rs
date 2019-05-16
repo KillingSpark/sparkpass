@@ -1,4 +1,4 @@
-use crate::util::{TreeNode, Options, prepare_entry_path,  get_tree_from_path, print_tree};
+use crate::util::{TreeNode, Options, prepare_entry_path,  get_tree_from_path, print_tree, flatten_tree};
 use crate::transform;
 
 use std::path;
@@ -40,15 +40,22 @@ pub fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transfor
     let renamed_tree = if is_root {
         match tree {
             TreeNode::Node(_, children) => {
-                TreeNode::Node("repo".to_owned(), children)
+                TreeNode::Node("".to_owned(), children)
             },
-            TreeNode::Leaf(_) => TreeNode::Leaf("repo".to_owned())
+            TreeNode::Leaf(_) => TreeNode::Leaf("".to_owned())
         }
     }else{
         tree
     };
 
-    print_tree(&renamed_tree, "".to_owned(), false, 0);
+    if opts.show_tree {
+        print_tree(&renamed_tree, "".to_owned(), false, 0); 
+    }else{
+        let vec = flatten_tree(&renamed_tree, "".to_owned());
+        for e in vec {
+            println!("{}", e);
+        }
+    }
 }
 
 //fn cmd_list(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {

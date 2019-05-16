@@ -3,7 +3,7 @@
 
 extern crate shellexpand;
 extern crate argparse;
-use argparse::{ArgumentParser, Store, StoreTrue, Collect};
+use argparse::{ArgumentParser, Store, StoreTrue, StoreFalse, Collect};
 
 use std::path;
 use std::io;
@@ -54,6 +54,8 @@ fn main() {
         recursive: false,
         force: false,
         line: 0,
+        show_tree: true,
+        interactive: true,
     };
 
     let mut command = String::new();
@@ -77,6 +79,14 @@ fn main() {
         ap.refer(&mut options.force)
             .add_option(&["--force", "-f"], StoreTrue,
             "Force overwrites for copy/move/generate/add");
+
+        ap.refer(&mut options.interactive)
+            .add_option(&["--interactiveoff", "-i"], StoreFalse,
+            "Dont ask for key if not found in argument/SPAKRPASS_KEY");
+
+         ap.refer(&mut options.show_tree)
+            .add_option(&["--treeoff", "-t"], StoreFalse,
+            "Show output of search/list as flat list of entries");
 
         ap.refer(&mut options.recursive)
             .add_option(&["--recursive", "-r"], StoreTrue,
@@ -120,6 +130,10 @@ fn main() {
     }
 
     if options.key == "" {
+        if !options.interactive {
+            println!("No key given and interactive mode deactived");
+            return;
+        }
         if options.verbose {
             println!("Need a key to retrieve passwords. Instead of interactive entering you can use either the --key/-k options or the SPARKPASS_KEY environment variable");
         }

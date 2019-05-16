@@ -3,6 +3,10 @@ use std::path;
 use std::fs;
 use std::str;
 
+
+extern crate levenshtein;
+use levenshtein::levenshtein;
+
 pub struct Options {
     pub args: Vec<String>,
     pub key: String,
@@ -11,11 +15,101 @@ pub struct Options {
     pub recursive: bool,
     pub force: bool,
     pub line: i32,
+    pub show_tree: bool,
+    pub interactive: bool,
 }
 
 pub enum TreeNode {
     Node(String, Vec<TreeNode>),
     Leaf(String),
+}
+
+fn copy_tree_node(tree: &TreeNode) -> TreeNode {
+    match tree {
+        TreeNode::Leaf(s) => TreeNode::Leaf(s.to_string()),
+        TreeNode::Node(s, children) => {
+            let mut newchildren = Vec::new();
+            for c in children {
+                newchildren.push(copy_tree_node(c));
+            }
+
+            TreeNode::Node(s.to_string(), newchildren)
+        }
+    }
+}
+
+pub fn sort_tree_leveshtein(tree: &TreeNode, words: Vec<&str>) -> TreeNode {
+    if words.len() == 0 {
+        return copy_tree_node(tree);
+    }
+
+    match tree {
+        TreeNode::Leaf(s) => TreeNode::Leaf(s.to_string()),
+        TreeNode::Node(s, children) => {
+            let mut newwords = words.clone();
+            newwords.remove(0);
+
+            let mut newchildren = Vec::new();
+            for c in children {
+                let newc = sort_tree_leveshtein(c, newwords.clone());
+                newchildren.push(copy_tree_node(&newc));
+            }
+
+            newchildren.sort_by(|a,b| {
+                let astr = match a {
+                    TreeNode::Node(s,_) => s,
+                    TreeNode::Leaf(s) => s
+                };
+                let bstr = match b {
+                    TreeNode::Node(s,_) => s,
+                    TreeNode::Leaf(s) => s
+                };
+
+                if astr.contains(words[0]) && !bstr.starts_with(words[0]) {
+                    return std::cmp::Ordering::Less;
+                }
+
+                if bstr.contains(words[0]) && !astr.starts_with(words[0]) {
+                    return std::cmp::Ordering::Greater;
+                }
+
+                let aleven = levenshtein(astr, words[0]);
+                let bleven = levenshtein(bstr, words[0]);
+
+                let aleven_norm = ((aleven as f64) * 1000.0  / (astr.len() as f64)) as usize;
+                let bleven_norm = ((bleven as f64) * 1000.0 / (bstr.len() as f64)) as usize;
+
+                aleven_norm.cmp(&bleven_norm)
+            });
+
+            TreeNode::Node(s.to_string(), newchildren)
+        }
+    }
+}
+
+pub fn flatten_tree(tree: &TreeNode, prefix: String) -> Vec<String> {
+    let mut res = Vec::new();
+    match tree {
+        TreeNode::Leaf(s) => {
+            let mut entry = prefix.clone();
+            entry.push('/');
+            entry.push_str(s.as_str());
+
+            res.push(entry);
+        },
+        TreeNode::Node(s, children) => {
+            let mut entry = prefix.clone();
+            entry.push('/');
+            entry.push_str(s.as_str());
+
+            for c in children {
+                let mut v = flatten_tree(c, entry.clone());
+                res.append(&mut v);
+            }
+        }
+    }
+
+    res
 }
 
 pub fn print_tree(tree: &TreeNode, prefix: String, last: bool, level: i32) {
