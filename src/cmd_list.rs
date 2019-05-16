@@ -1,57 +1,10 @@
-use crate::util::{TreeNode, Options, prepare_entry_path,  get_tree_from_path};
+use crate::util::{TreeNode, Options, prepare_entry_path,  get_tree_from_path, print_tree};
 use crate::transform;
 
 use std::path;
 
 
-fn print_tree(tree: &TreeNode, prefix: String, last: bool, level: i32) {
-     match tree {
-        TreeNode::Leaf(name) => {
-            if level > 0 {
-                print!("{}", prefix);
 
-                if last {
-                    println!("└── {}", name);
-                }else{
-                    println!("├── {}", name);
-                }
-            }else{
-                println!("{}", name);
-            }
-        },
-        TreeNode::Node(name, children) => {
-            if level != 0 { 
-                print!("{}", prefix);
-                if last {
-                    println!("└── {}", name);
-                }else{
-                    println!("├── {}", name);
-                }
-            }else {
-                println!("{}", name);
-            }
-
-            let mut i = 0;
-            for c in children {
-                i+=1;
-                let mut prefix_new = prefix.clone();
-                if level > 0 {
-                    if !last {
-                        prefix_new.push_str("│   ");
-                    }else{
-                        prefix_new.push_str("    ");
-                    }
-                }
-
-                if i != children.len() {
-                    print_tree(c, prefix_new, false, level+1);
-                }else{
-                    print_tree(c, prefix_new, true, level+1);
-                }
-            }
-        }
-    }
-}
 
 pub fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
     if opts.args.len() > 1 {

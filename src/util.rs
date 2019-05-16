@@ -18,6 +18,55 @@ pub enum TreeNode {
     Leaf(String),
 }
 
+pub fn print_tree(tree: &TreeNode, prefix: String, last: bool, level: i32) {
+     match tree {
+        TreeNode::Leaf(name) => {
+            if level > 0 {
+                print!("{}", prefix);
+
+                if last {
+                    println!("└── {}", name);
+                }else{
+                    println!("├── {}", name);
+                }
+            }else{
+                println!("{}", name);
+            }
+        },
+        TreeNode::Node(name, children) => {
+            if level != 0 { 
+                print!("{}", prefix);
+                if last {
+                    println!("└── {}", name);
+                }else{
+                    println!("├── {}", name);
+                }
+            }else {
+                println!("{}", name);
+            }
+
+            let mut i = 0;
+            for c in children {
+                i+=1;
+                let mut prefix_new = prefix.clone();
+                if level > 0 {
+                    if !last {
+                        prefix_new.push_str("│   ");
+                    }else{
+                        prefix_new.push_str("    ");
+                    }
+                }
+
+                if i != children.len() {
+                    print_tree(c, prefix_new, false, level+1);
+                }else{
+                    print_tree(c, prefix_new, true, level+1);
+                }
+            }
+        }
+    }
+}
+
 //remove slashes at the start and end
 pub fn prepare_entry_path(path: &str) -> &str {
     let mut tmp = path.trim_start_matches("/");

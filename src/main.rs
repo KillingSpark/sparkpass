@@ -27,7 +27,7 @@ use cmd_move::cmd_move;
 mod cmd_remove;
 use cmd_remove::cmd_remove;
 mod cmd_search;
-use cmd_search::cmd_search;
+use cmd_search::cmd_search_fuzzy;
 mod cmd_show;
 use cmd_show::cmd_show;
 
@@ -156,10 +156,10 @@ fn main() {
         },
 
         "find" =>  {
-            cmd_search(&options, repopath, &enc_params);
+            cmd_search_fuzzy(&options, repopath, &enc_params);
         },
         "search" => {
-            cmd_search(&options, repopath, &enc_params);
+            cmd_search_fuzzy(&options, repopath, &enc_params);
         },
         
         "show" => {
