@@ -3,6 +3,10 @@ use crate::util::{Options, add_entry, get_tree_from_path, show_entry, prepare_en
 use crate::transform;
 use crate::util::TreeNode;
 
+extern crate url;
+use url::Url;
+use std::str::FromStr;
+
 pub fn cmd_import(opts: &Options, prefix: &std::path::Path ,enc_params: &transform::EncryptionParams)  {
     match opts.args[0].as_str() {
         "keepass_csv" => {
@@ -107,8 +111,26 @@ fn import_from_keepass_csv(prefix: &std::path::Path, p: &std::path::Path, enc_pa
         content.push_str(comment);
         content.push('\n');
 
-        let mut entry = String::from(url);
-        entry.push_str("/");
+        let mut entry = "keepass_import/".to_owned();
+        if url != "" {
+            match Url::from_str(url) {
+                Err(_) => {
+                    entry.push_str(url);
+                    entry.push('/');
+                },
+                Ok(url) => {
+                    match url.domain() {
+                        None => {
+                        },
+                        Some(domain) => {
+                            entry.push_str(domain);
+                            entry.push('/');
+                        }
+                    }
+                }
+            }
+            
+        }
         entry.push_str(acc);
 
         match add_entry(prefix, std::path::Path::new(entry.as_str()), content.as_str(), false, enc_params) {

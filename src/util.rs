@@ -249,7 +249,9 @@ pub fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, overwrite:
     };
 
     if exists && !overwrite {
-        return Err("Entry exists already".to_owned())
+        let mut err = "Entry exists already: ".to_owned();
+        err.push_str(p.to_str().unwrap());
+        return Err(err.to_owned())
     }else{
         let full_path_dir = full_path.as_path().parent().unwrap();
         match fs::create_dir_all(full_path_dir) {
