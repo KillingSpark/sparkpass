@@ -53,7 +53,7 @@ pub fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transfor
     }else{
         let vec = flatten_tree(&renamed_tree, "".to_owned());
         for e in vec {
-            println!("{}", e);
+            println!("{}", prepare_entry_path(&e));
         }
     }
 }
