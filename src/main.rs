@@ -4,9 +4,9 @@
 extern crate shellexpand;
 extern crate argparse;
 use argparse::{ArgumentParser, Store, StoreTrue, StoreFalse, Collect};
+extern crate rpassword;
 
 use std::path;
-use std::io;
 use openssl::sha::sha256;
 
 // internal imports
@@ -40,9 +40,8 @@ use util::Options;
 
 fn read_key_from_terminal() -> String {
     println!("Enter key to repo (it is recommended to use SPARKPASS_KEY instead of interactive entering): ");
-    let mut key = String::new();
-    io::stdin().read_line(&mut key).expect("Failed to read line");
-    return key.trim_end().to_owned();
+    let pass = rpassword::read_password().unwrap();
+    return pass.to_owned();
 }
 
 fn main() {
