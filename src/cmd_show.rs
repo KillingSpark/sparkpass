@@ -14,7 +14,7 @@ pub fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::Enc
     let mut content = match show_entry(prefix, path::Path::new(relative_path), enc_params) {
         Ok(c) => c,
         Err(_) => {
-            //entry doesnt exist. Search for it instead
+            //entry doesn't exist. Search for it instead
             cmd_search(opts, prefix, enc_params);
             return;
         },

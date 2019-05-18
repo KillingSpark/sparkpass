@@ -28,7 +28,7 @@ pub fn cmd_generate(opts: &Options, prefix: &path::Path , enc_params: &transform
     match add_entry(prefix, path::Path::new(relative_path), passwd.as_str(), opts.force, enc_params) {
         Ok(_) => {},
         Err(e) => {
-            println!("An error occured while adding the entry: {}", e);
+            println!("An error occurred while adding the entry: {}", e);
             return;
         },
     }

@@ -33,7 +33,7 @@ pub fn cmd_copy(opts: &Options, prefix: &path::Path , enc_params: &transform::En
             Some(p) => {
                 match fs::create_dir_all(p){
                     Ok(_) => {},
-                        Err(e) => {println!("An error occured while creating the needed directories: {}", e);
+                        Err(e) => {println!("An error occurred while creating the needed directories: {}", e);
                         return;
                     },
                 }
@@ -44,7 +44,7 @@ pub fn cmd_copy(opts: &Options, prefix: &path::Path , enc_params: &transform::En
         match fs::copy(full_path_old, full_path_new){
             Ok(_) => {},
             Err(e) => {
-                println!("An error occured while copying to new location: {}", e);
+                println!("An error occurred while copying to new location: {}", e);
                 return;
             },
         };

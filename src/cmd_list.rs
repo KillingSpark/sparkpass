@@ -32,7 +32,7 @@ pub fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transfor
     let tree = match get_tree_from_path(full_path, is_root, enc_params){
         Ok(t) => t,
         Err(err) => {
-            println!("An error occured while listing entries: {}", err);
+            println!("An error occurred while listing entries: {}", err);
             return;
         },
     };

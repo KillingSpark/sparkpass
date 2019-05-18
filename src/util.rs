@@ -177,7 +177,7 @@ pub fn get_tree_from_path(p: &path::Path, is_clear: bool, enc_params: &transform
 
     let it = match fs::read_dir(p) {
         Ok(iter) => iter,
-        Err(_) => return Err("Couldnt read directory".to_owned()),
+        Err(_) => return Err("Couldn't read directory".to_owned()),
     };
 
     let mut result = Vec::new();
@@ -214,7 +214,7 @@ pub fn get_tree_from_path(p: &path::Path, is_clear: bool, enc_params: &transform
 pub fn get_all_entries_in_path(p: &path::Path) -> Result<Vec<(String,bool)>, String> {
     let it = match fs::read_dir(p) {
         Ok(iter) => iter,
-        Err(_) => return Err("Couldnt read directory".to_owned()),
+        Err(_) => return Err("Couldn't read directory".to_owned()),
     };
 
     let mut result = Vec::new();
@@ -249,7 +249,7 @@ pub fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, overwrite:
     };
 
     if exists && !overwrite {
-        let mut err = "Entry exists already: ".to_owned();
+        let mut err = "Entry already exists: ".to_owned();
         err.push_str(p.to_str().unwrap());
         return Err(err.to_owned())
     }else{
@@ -257,7 +257,7 @@ pub fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, overwrite:
         match fs::create_dir_all(full_path_dir) {
             Ok(_) => {},
             Err(_) => {
-                return Err("An error occured while creating necessary parent directories".to_owned());
+                return Err("An error occurred while creating necessary parent directories".to_owned());
             }
         }
     }
@@ -266,7 +266,7 @@ pub fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, overwrite:
     match fs::write(full_path, trans_content) {
         Ok(_) => {},
         Err(_) => {
-            return Err("An error occured while writing the content to the file".to_owned());
+            return Err("An error occurred while writing the content to the file".to_owned());
         }
     }
 
@@ -293,7 +293,7 @@ pub fn show_entry(prefix: &path::Path, p: &path::Path, enc_params: &transform::E
     let res = match fs::read(full_path) {
         Ok(r) => r,
         Err(_) => {
-            return Err("An error occured while reading the entry from the file".to_owned());
+            return Err("An error occurred while reading the entry from the file".to_owned());
         }
     };
 

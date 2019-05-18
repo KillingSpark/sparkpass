@@ -72,7 +72,7 @@ pub fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::E
     let entries = match get_all_entries_in_path(trans_path_dir){
         Ok(vec) => vec,
         Err(err) => {
-            println!("An error occured while listing entries: {}", err);
+            println!("An error occurred while listing entries: {}", err);
             return;
         },
     };
