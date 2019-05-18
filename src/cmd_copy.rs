@@ -6,7 +6,7 @@ use std::fs;
 
 pub fn cmd_copy(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
     if opts.args.len() != 2 {
-        println!("Too many arguments. Want: 'old_path, new_path'  Got: {}", opts.args.len());
+        println!("Incorrect number of arguments. Want: 'old_path, new_path'  Got: {}", opts.args.len());
         return;
     }
 

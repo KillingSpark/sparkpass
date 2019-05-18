@@ -6,7 +6,7 @@ use std::path;
 
 pub fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() != 1 {
-        println!("Too many arguments. Want: 'path_to_entry'  Got: {}", opts.args.len());
+        println!("Incorrect number of arguments. Want: 'path_to_entry'  Got: {}", opts.args.len());
         return;
     }
 

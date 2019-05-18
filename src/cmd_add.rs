@@ -5,7 +5,7 @@ use std::path;
 
 pub fn cmd_add(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() != 2 {
-        println!("Too many arguments. Want: 'path_new, content'  Got: {}", opts.args.len());
+        println!("Incorrect number of arguments. Want: 'path_new, content'  Got: {}", opts.args.len());
         return;
     }
 

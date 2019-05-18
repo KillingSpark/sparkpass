@@ -7,8 +7,8 @@ use std::path;
 
 
 pub fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
-    if opts.args.len() > 1 {
-        println!("Too many arguments. Want: 'path_to_dir'  Got: {}", opts.args.len());
+    if opts.args.len() < 1 {
+        println!("Too many arguments. Want: '[path_to_dir]'  Got: {}", opts.args.len());
         return;
     }
 

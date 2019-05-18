@@ -5,7 +5,7 @@ use std::path;
 
 pub fn cmd_search_fuzzy (opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() > 1 {
-        println!("Too many arguments. Want: 'pattern'  Got: {}", opts.args.len());
+        println!("Too many arguments. Want: '[pattern]'  Got: {}", opts.args.len());
         return;
     }
 
@@ -32,7 +32,7 @@ pub fn cmd_search_fuzzy (opts: &Options, prefix: &path::Path, enc_params: &trans
 
 pub fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() > 1 {
-        println!("Too many arguments. Want: 'pattern'  Got: {}", opts.args.len());
+        println!("Too many arguments. Want: '[pattern]'  Got: {}", opts.args.len());
         return;
     }
 

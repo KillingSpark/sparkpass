@@ -5,14 +5,14 @@ use crate::generate;
 use std::path;
 
 pub fn cmd_generate(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
-    if opts.args.len() > 2 {
-        println!("Too many arguments. Want: 'path, [length]'  Got: {}", opts.args.len());
+    if opts.args.len() > 2 || opts.args.len() < 1 {
+        println!("Incorrect number of arguments. Want: 'path, [length]'  Got: {}", opts.args.len());
         return;
     }
 
     let relative_path = prepare_entry_path(opts.args[0].as_str());
     
-    let passwd = if opts.args.len() >= 2 {
+    let passwd = if opts.args.len() == 2 {
         let length = match opts.args[1].trim().parse() {
             Ok(i) => i,
             Err(e) => {
