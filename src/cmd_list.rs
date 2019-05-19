@@ -7,8 +7,8 @@ use std::path;
 
 
 pub fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
-    if opts.args.len() > 1 {
-        println!("Too many arguments. Want: 'path_to_dir'  Got: {}", opts.args.len());
+    if opts.args.len() < 1 {
+        println!("Too many arguments. Want: '[path_to_dir]'  Got: {}", opts.args.len());
         return;
     }
 
@@ -32,7 +32,7 @@ pub fn cmd_list_tree(opts: &Options, prefix: &path::Path , enc_params: &transfor
     let tree = match get_tree_from_path(full_path, is_root, enc_params){
         Ok(t) => t,
         Err(err) => {
-            println!("An error occured while listing entries: {}", err);
+            println!("An error occurred while listing entries: {}", err);
             return;
         },
     };

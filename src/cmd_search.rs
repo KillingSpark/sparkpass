@@ -5,7 +5,7 @@ use std::path;
 
 pub fn cmd_search_fuzzy (opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() > 1 {
-        println!("Too many arguments. Want: 'pattern'  Got: {}", opts.args.len());
+        println!("Too many arguments. Want: '[pattern]'  Got: {}", opts.args.len());
         return;
     }
 
@@ -32,7 +32,7 @@ pub fn cmd_search_fuzzy (opts: &Options, prefix: &path::Path, enc_params: &trans
 
 pub fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() > 1 {
-        println!("Too many arguments. Want: 'pattern'  Got: {}", opts.args.len());
+        println!("Too many arguments. Want: '[pattern]'  Got: {}", opts.args.len());
         return;
     }
 
@@ -72,7 +72,7 @@ pub fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::E
     let entries = match get_all_entries_in_path(trans_path_dir){
         Ok(vec) => vec,
         Err(err) => {
-            println!("An error occured while listing entries: {}", err);
+            println!("An error occurred while listing entries: {}", err);
             return;
         },
     };

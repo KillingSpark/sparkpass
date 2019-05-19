@@ -6,7 +6,7 @@ use std::fs;
 
 pub fn cmd_remove(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
     if opts.args.len() != 1 {
-        println!("Too many arguments. Want: 'path'  Got: {}", opts.args.len());
+        println!("Incorrect number of arguments. Want: 'path'  Got: {}", opts.args.len());
         return;
     }
 
@@ -20,7 +20,7 @@ pub fn cmd_remove(opts: &Options, prefix: &path::Path , enc_params: &transform::
         match fs::remove_file(full_path) {
             Ok(_) => {},
             Err(e) => {
-                println!("An error occured while removing: {}", e);
+                println!("An error occurred while removing: {}", e);
                 return;
             },
         }
@@ -30,7 +30,7 @@ pub fn cmd_remove(opts: &Options, prefix: &path::Path , enc_params: &transform::
                 match fs::remove_dir_all(full_path) {
                     Ok(_) => {},
                     Err(e) => {
-                        println!("An error occured while removing: {}", e);
+                        println!("An error occurred while removing: {}", e);
                         return;
                     },
                 }

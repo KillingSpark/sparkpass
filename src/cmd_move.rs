@@ -6,7 +6,7 @@ use std::fs;
 
 pub fn cmd_move(opts: &Options, prefix: &path::Path , enc_params: &transform::EncryptionParams) {
     if opts.args.len() != 2 {
-        println!("Too many arguments. Want: 'old_path, new_path'  Got: {}", opts.args.len());
+        println!("Incorrect number of arguments. Want: 'old_path, new_path'  Got: {}", opts.args.len());
         return;
     }
 
@@ -28,6 +28,6 @@ pub fn cmd_move(opts: &Options, prefix: &path::Path , enc_params: &transform::En
 
     match fs::rename(full_path_old, full_path_new) {
         Ok(_) => {},
-        Err(e) => println!("An error occured while moving: {}", e),
+        Err(e) => println!("An error occurred while moving: {}", e),
     }
 }

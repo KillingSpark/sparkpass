@@ -81,7 +81,7 @@ fn main() {
 
         ap.refer(&mut options.interactive)
             .add_option(&["--interactiveoff", "-i"], StoreFalse,
-            "Dont ask for key if not found in argument/SPAKRPASS_KEY");
+            "Don't ask for key if not found in argument/SPAKRPASS_KEY");
 
          ap.refer(&mut options.show_tree)
             .add_option(&["--treeoff", "-t"], StoreFalse,
@@ -97,7 +97,7 @@ fn main() {
 
         ap.refer(&mut options.line)
             .add_option(&["--line", "-l"], Store,
-            "Specify which line of  multiline file you want to show. If set to -1 all lines will be printed. Default is line 0.");
+            "Specify which line of multiline file you want to show. If set to -1 all lines will be printed. Default is line 0.");
 
         ap.refer(&mut options.key)
             .add_option(&["--key", "-k"], Store,
@@ -130,7 +130,7 @@ fn main() {
 
     if options.key == "" {
         if !options.interactive {
-            println!("No key given and interactive mode deactived");
+            println!("No key given and interactive mode deactivated");
             return;
         }
         if options.verbose {

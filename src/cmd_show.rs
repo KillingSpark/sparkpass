@@ -6,7 +6,7 @@ use std::path;
 
 pub fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() != 1 {
-        println!("Too many arguments. Want: 'path_to_entry'  Got: {}", opts.args.len());
+        println!("Incorrect number of arguments. Want: 'path_to_entry'  Got: {}", opts.args.len());
         return;
     }
 
@@ -14,7 +14,7 @@ pub fn cmd_show(opts: &Options, prefix: &path::Path, enc_params: &transform::Enc
     let mut content = match show_entry(prefix, path::Path::new(relative_path), enc_params) {
         Ok(c) => c,
         Err(_) => {
-            //entry doesnt exist. Search for it instead
+            //entry doesn't exist. Search for it instead
             cmd_search(opts, prefix, enc_params);
             return;
         },
