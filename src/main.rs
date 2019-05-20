@@ -55,6 +55,7 @@ fn main() {
         line: 0,
         show_tree: true,
         interactive: true,
+        multiline: true,
     };
 
     let mut command = String::new();
@@ -98,6 +99,10 @@ fn main() {
         ap.refer(&mut options.line)
             .add_option(&["--line", "-l"], Store,
             "Specify which line of multiline file you want to show. If set to -1 all lines will be printed. Default is line 0.");
+
+        ap.refer(&mut options.multiline)
+            .add_option(&["--multiline", "-m"], StoreTrue,
+            "Add a new multiline content");
 
         ap.refer(&mut options.key)
             .add_option(&["--key", "-k"], Store,

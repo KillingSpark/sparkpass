@@ -3,6 +3,8 @@ extern crate rpassword;
 use crate::transform;
 use crate::util::{add_entry, prepare_entry_path, Options};
 
+use std::io::{self, BufRead, BufReader, Read};
+
 use std::path;
 
 fn read_password_from_terminal(name: String) -> String {
@@ -11,6 +13,16 @@ fn read_password_from_terminal(name: String) -> String {
     return pass.to_owned();
 }
 
+fn read_multiline<T: Read>(reader: T) -> String {
+    BufReader::new(reader)
+        .lines()
+        .map(|x| match x {
+            Ok(y) => y,
+            Err(_) => "".to_string(),
+        })
+        .collect::<Vec<String>>()
+        .join("")
+}
 pub fn cmd_add(opts: &Options, prefix: &path::Path, enc_params: &transform::EncryptionParams) {
     if opts.args.len() < 1 || opts.args.len() > 2 {
         println!(
