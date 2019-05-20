@@ -55,7 +55,7 @@ fn main() {
         line: 0,
         show_tree: true,
         interactive: true,
-        multiline: true,
+        multiline: false,
     };
 
     let mut command = String::new();
