@@ -17,6 +17,7 @@ pub struct Options {
     pub line: i32,
     pub show_tree: bool,
     pub interactive: bool,
+    pub multiline: bool,
 }
 
 pub enum TreeNode {
