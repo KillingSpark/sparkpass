@@ -173,7 +173,10 @@ pub fn prepare_entry_path(path: &str) -> &str {
 pub fn get_tree_from_path(p: &path::Path, is_clear: bool, enc_params: &transform::EncryptionParams) -> Result<TreeNode, String> {
     if p.is_file() {
         let filename = p.file_name().unwrap().to_str().unwrap();
-        return Ok(TreeNode::Leaf(transform::retransform_entry(enc_params, filename)));
+        return match transform::retransform_entry(enc_params, filename) {
+            Ok(s) =>  Ok(TreeNode::Leaf(s)),
+            Err(e) => Err(e),
+        }
     }
 
     let it = match fs::read_dir(p) {
@@ -205,7 +208,10 @@ pub fn get_tree_from_path(p: &path::Path, is_clear: bool, enc_params: &transform
     let filename = p.file_name().unwrap().to_str().unwrap();
 
     let dirname = if !is_clear {
-        transform::retransform_entry(enc_params, filename)
+        match transform::retransform_entry(enc_params, filename) {
+            Ok(s) => s,
+            Err(e) => return Err(e),
+        }
     }else{
         filename.to_owned()
     };
@@ -300,7 +306,6 @@ pub fn show_entry(prefix: &path::Path, p: &path::Path, enc_params: &transform::E
 
 
     let content = str::from_utf8(res.as_slice()).unwrap().to_owned();
-    let clear_content = transform::retransform_entry(enc_params, content.as_str());
-
-    return Ok(clear_content);
+    
+    transform::retransform_entry(enc_params, content.as_str())
 }

@@ -80,7 +80,13 @@ pub fn cmd_search(opts: &Options, prefix: &path::Path, enc_params: &transform::E
 
     let mut filtered = Vec::new();
     for (e, dir) in entries {
-        let clear_entry = transform::retransform_entry(enc_params, &(e[..]));
+        let clear_entry = match transform::retransform_entry(enc_params, &(e[..])) {
+            Ok(s) => s,
+            Err(e) => {
+                println!("Error occured while decrypting: {}", e); 
+                return
+            },
+        };
         if !clear_entry.contains(last) && !(clear_entry == last) {
             continue;
         }

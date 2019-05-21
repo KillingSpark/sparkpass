@@ -23,7 +23,7 @@ pub fn transform_entry(enc_params: &EncryptionParams, entry: &str)-> String {
 }
 
 //from encrypted to clear
-pub fn retransform_entry(enc_params: &EncryptionParams, entry: &str) -> String {
+pub fn retransform_entry(enc_params: &EncryptionParams, entry: &str) -> Result<String, String> {
     let cipher = Cipher::aes_256_cbc();
    
     let ciphertext = base64::decode_config(entry, base64::URL_SAFE).unwrap();
@@ -33,9 +33,12 @@ pub fn retransform_entry(enc_params: &EncryptionParams, entry: &str) -> String {
         enc_params.key, 
         Some(enc_params.iv), 
         ciphertext.as_slice(),
-    ).unwrap();
+    );
 
-    return std::str::from_utf8(result.as_slice()).unwrap().to_owned()
+    return match result {
+        Ok(r) => Ok(std::str::from_utf8(r.as_slice()).unwrap().to_owned()),
+        Err(_) => Err("Could not decrypt. Is the key correct?".to_owned()),
+    }
 }
 
 //pub fn retransform_path(enc_params: &EncryptionParams, path: &str) -> Vec<String> {
