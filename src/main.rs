@@ -30,6 +30,8 @@ mod cmd_search;
 use cmd_search::cmd_search_fuzzy;
 mod cmd_show;
 use cmd_show::cmd_show;
+mod cmd_init;
+use cmd_init::cmd_init;
 
 mod export_import;
 use export_import::{cmd_import, cmd_export};
@@ -161,6 +163,10 @@ fn main() {
     let repopath = path::Path::new(options.repo.as_str());
 
     match &(command)[..] {
+        "init" => {
+            cmd_init(&options);
+        },
+
         "ls" => {
             cmd_list_tree(&options, repopath, &enc_params);
         },
