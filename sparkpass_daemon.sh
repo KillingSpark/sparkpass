@@ -30,4 +30,4 @@ do
     fi
 done
 
-echo "daemon exit"
+rm -f $pipe
