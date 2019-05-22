@@ -48,7 +48,7 @@ pub fn cmd_add(opts: &Options, prefix: &path::Path, enc_params: &transform::Encr
             println!("Enter multiline content for {}: ", opts.args[0].to_string());
             read_multiline(io::stdin())
         } else {
-            print!("Enter content for {}: ", opts.args[0].to_string());
+            println!("Enter content for {}: ", opts.args[0].to_string());
             read_password_from_terminal()
         }
     } else {
