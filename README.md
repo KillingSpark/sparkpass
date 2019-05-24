@@ -26,3 +26,9 @@ THIS WILL STORE YOUR KEY IN THE ~/.bash_history IF YOU DONT ENTER A SPACE AT THE
 You can also use ```unset HISTFILE``` before you enter any command.
 
 Of course there is also an interactive prompt for the key but right now it is visible in clear on the screen.
+
+## Convenient usage
+There is a simple daemon that listens on a socket in /tmp/sparkpass. You need to give it the repo password only once.
+If it reads "show" from this it will show "rofi -dmenu" with all entries in the repo, and will copy the content of the file into xclip.
+
+After you are done logging into all the things you can kill the daemon and your repo will be secure again.
