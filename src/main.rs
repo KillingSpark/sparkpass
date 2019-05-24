@@ -149,6 +149,7 @@ fn main() {
     let keyhash = sha256(options.key.as_bytes());
     let enc_params = transform::EncryptionParams{
         key: &keyhash,
+        //this iv is only used for encrypting the path. This must unfortunately be deterministic.
         iv:  b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07",
     };
 

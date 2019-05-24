@@ -269,7 +269,7 @@ pub fn add_entry(prefix : &path::Path, p: &path::Path, content: &str, overwrite:
         }
     }
 
-    let trans_content = transform::transform_entry(enc_params, content);
+    let trans_content = transform::transform_entry_with_random_iv(enc_params, content);
     match fs::write(full_path, trans_content) {
         Ok(_) => {},
         Err(_) => {
@@ -307,5 +307,5 @@ pub fn show_entry(prefix: &path::Path, p: &path::Path, enc_params: &transform::E
 
     let content = str::from_utf8(res.as_slice()).unwrap().to_owned();
     
-    transform::retransform_entry(enc_params, content.as_str())
+    transform::retransform_entry_with_random_iv(enc_params, content.as_str())
 }
