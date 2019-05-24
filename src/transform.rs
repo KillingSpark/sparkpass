@@ -4,6 +4,8 @@ use openssl::symm::{decrypt, encrypt, Cipher};
 extern crate base64;
 use std::io::Read;
 
+pub static DEFAULT_IV: &[u8] = b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07";
+
 pub struct EncryptionParams<'a> {
     pub key: &'a [u8],
     pub iv: &'a [u8],

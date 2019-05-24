@@ -10,11 +10,11 @@ use std::path;
 use openssl::sha::sha256;
 
 // internal imports
-mod transform;
-mod generate;
-mod util;
+extern crate sparkpass;
+use sparkpass::transform;
+use sparkpass::util;
 
-mod cmd;
+use sparkpass::cmd;
 use cmd::cmd_add::cmd_add;
 use cmd::cmd_copy::cmd_copy;
 use cmd::cmd_generate::cmd_generate;
@@ -25,7 +25,7 @@ use cmd::cmd_search::cmd_search_fuzzy;
 use cmd::cmd_show::cmd_show;
 use cmd::cmd_init::cmd_init;
 
-mod export_import;
+use sparkpass::export_import;
 use export_import::{cmd_import, cmd_export};
 
 use util::Options;
@@ -150,7 +150,7 @@ fn main() {
     let enc_params = transform::EncryptionParams{
         key: &keyhash,
         //this iv is only used for encrypting the path. This must unfortunately be deterministic.
-        iv:  b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07",
+        iv: transform::DEFAULT_IV,
     };
 
     let repopath = path::Path::new(options.repo.as_str());
