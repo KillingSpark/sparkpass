@@ -1,6 +1,6 @@
 use crate::util::{Options, prepare_entry_path, show_entry};
 use crate::transform;
-use crate::cmd_search::cmd_search;
+use crate::cmd::cmd_search::cmd_search;
 
 use std::path;
 
