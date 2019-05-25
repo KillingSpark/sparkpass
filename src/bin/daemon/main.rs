@@ -100,7 +100,7 @@ fn run_daemon() -> Result<(), dbus::Error> {
         prefix: Box::from(std::path::Path::new("/home/moritz/.sparkpass/")),
     };
 
-    let dmn_rc = std::rc::Rc::new(std::cell::RefCell::new(dmn));
+    let dmn_rc = std::sync::Arc::new(std::cell::RefCell::new(dmn));
     let dmn_ls = dmn_rc.clone();
     let dmn_ul = dmn_rc.clone();
     let dmn_shw = dmn_rc.clone();
@@ -117,7 +117,7 @@ fn run_daemon() -> Result<(), dbus::Error> {
                     f.method("Unlock", (), move |m| {
                         dmn_ul.borrow_mut().handle_unlock(&m.msg)
                     })
-                    .inarg::<&str, _>("name"),
+                    .inarg::<&str, _>("key"),
                 )
                 .add_m(
                     f.method("Show", (), move |m| {
