@@ -24,7 +24,7 @@ do
         fi
 
         if [[ "$line" == 'show' ]]; then
-            cargo run -- -i show  $(cargo run -- -i ls -t | rofi -dmenu) | xclip -sel clip
+            cargo run --bin spass -- -i show  $(cargo run --bin spass -- -i ls -t | rofi -dmenu) | xclip -sel clip
         fi
         echo "Received: "$line
     fi

@@ -14,15 +14,15 @@ use std::collections::HashMap;
 mod collection_calls;
 mod item_calls;
 mod service_calls;
+mod session_calls;
 
 pub struct Collection {
     key: Option<Vec<u8>>,
     prefix: Box<std::path::Path>,
 }
 
-struct Handler {
+pub struct Handler {
     default_coll: Collection,
-    sessions: HashMap<String, HashMap<String, Collection>>, //unlocked collections per session
 }
 
 impl MsgHandler for Handler {
@@ -86,17 +86,7 @@ impl MsgHandler for Handler {
                     }
                 }
                 "session" => {
-                    if interface != "org.freedesktop.Secrets.Session" {
-                        panic!(
-                            "Called default collection with wrong interface: {}",
-                            interface
-                        );
-                    }
-                    match member.as_str() {
-                        _ => {
-                            unimplemented!("session interface");
-                        }
-                    }
+                    return session_calls::handle_session_calls(interface.as_str(), member.as_str());
                 }
                 "collection" => {
                     if route.len() == 2 {
@@ -212,6 +202,7 @@ fn run_default_coll() -> Result<(), dbus::Error> {
 
     println!("Enter key for repo");
     let pass = rpassword::read_password().unwrap();
+    println!("Thanks");
 
     let home = std::env::var("HOME").unwrap();
     let repo = std::path::Path::new(home.as_str()).join(".sparkpass/".to_owned());
@@ -222,7 +213,6 @@ fn run_default_coll() -> Result<(), dbus::Error> {
             key: Some(pass.as_bytes().to_vec()),
             prefix: Box::from(repo),
         },
-        sessions: HashMap::new(),
     };
 
     c.add_handler(handler);
