@@ -93,6 +93,7 @@ impl MsgHandler for Handler {
                 }
                 "session" => {
                     return session_calls::handle_session_calls(
+                        msg,
                         interface.as_str(),
                         member.as_str(),
                     );
@@ -156,7 +157,10 @@ impl Collection {
             match get_tree_from_path(std::path::Path::new(full_path.as_str()), true, &enc_params) {
                 Ok(t) => t,
                 Err(e) => {
-                    return Err(MethodErr::failed(&format!("Error while reading entries: {}", e)));
+                    return Err(MethodErr::failed(&format!(
+                        "Error while reading entries: {}",
+                        e
+                    )));
                 }
             };
 

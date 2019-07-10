@@ -10,7 +10,14 @@ pub fn handle_item_calls(
     match interface {
         "org.freedesktop.Secrets.Item" => match member {
             _ => {
-                panic!("Unknown command");
+                return Some(MsgHandlerResult {
+                    done: false,
+                    handled: true,
+                    reply: vec![
+                        dbus::tree::MethodErr::failed(&"Wrong interface for this object")
+                            .to_message(msg),
+                    ],
+                });
             }
         },
         "DBus.Properties" => match member {

@@ -9,14 +9,22 @@ pub fn handle_collection_calls(
     match interface {
         "org.freedesktop.Secrets.Collection" => match member {
             _ => {
-                panic!("Unknown command");
+                return Some(MsgHandlerResult {
+                    done: false,
+                    handled: true,
+                    reply: vec![dbus::tree::MethodErr::failed(&"Unknown member").to_message(msg)],
+                });
             }
         },
         "DBus.Properties" => match member {
             "Get" => {
                 let (iface, propname): (String, String) = msg.read2().unwrap();
                 if iface != "org.freedesktop.Secrets.Collection" {
-                    panic!("Tried to get property of other interface than org.freedesktop.Secrets.Collection");
+                    return Some(MsgHandlerResult {
+                    done: false,
+                    handled: true,
+                    reply: vec![dbus::tree::MethodErr::failed(&"Tried to get property of other interface than org.freedesktop.Secrets.Collection").to_message(msg)],
+                });
                 }
                 match propname.as_str() {
                     "Items" => {

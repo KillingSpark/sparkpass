@@ -8,7 +8,13 @@ pub fn handle_service_calls(
     member: &str,
 ) -> Option<MsgHandlerResult> {
     if interface != "org.freedesktop.Secrets.Service" {
-        panic!("Called service with wrong interface: {}", interface);
+        return Some(MsgHandlerResult {
+            done: false,
+            handled: true,
+            reply: vec![
+                dbus::tree::MethodErr::failed(&"Wrong interface for this object").to_message(msg),
+            ],
+        });
     }
     match member {
         "OpenSession" => {
