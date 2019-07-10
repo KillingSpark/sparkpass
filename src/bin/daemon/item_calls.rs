@@ -33,19 +33,39 @@ pub fn handle_item_calls(
                         .to_message(msg)],
                     });
                 }
-                let name = route[2..].join("/");
-                println!("{}, {}, {}", iface, propname, name);
-                let return_msg = (*msg)
-                    .method_return()
-                    .append1(coll.handle_show(name.as_str()).unwrap());
 
-                let result = MsgHandlerResult {
-                    done: false,
-                    handled: true,
-                    //TODO generate sessions
-                    reply: vec![return_msg],
-                };
-                return Some(result);
+                match propname.as_str() {
+                    "Secret" => {
+                        let name = route[2..].join("/");
+                        let return_msg = (*msg)
+                            .method_return()
+                            .append1(coll.handle_show(name.as_str()).unwrap());
+
+                        let result = MsgHandlerResult {
+                            done: false,
+                            handled: true,
+                            //TODO generate sessions
+                            reply: vec![return_msg],
+                        };
+                        return Some(result);
+                    }
+                    "Locked" => {
+                        return Some(MsgHandlerResult {
+                            done: false,
+                            handled: true,
+                            //todo generate sessions
+                            reply: vec![msg.method_return().append1(false)],
+                        });
+                    }
+                    _ => {
+                        return Some(MsgHandlerResult {
+                            done: false,
+                            handled: true,
+                            reply: vec![dbus::tree::MethodErr::failed(&"Collection interface not implemented")
+                                .to_message(msg)],
+                        })
+                    }
+                }
             }
             "Set" => {
                 let (_iface, _propname): (String, String) = msg.read2().unwrap();
