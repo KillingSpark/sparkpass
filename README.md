@@ -32,3 +32,12 @@ There is a simple daemon that listens on a socket in /tmp/sparkpass. You need to
 If it reads "show" from this it will show "rofi -dmenu" with all entries in the repo, and will copy the content of the file into xclip.
 
 After you are done logging into all the things you can kill the daemon and your repo will be secure again.
+
+## CMD interaction with DBus-Daemon
+### Get secret
+dbus-send --print-reply  --dest=spark.pass /org/freedesktop/Secrets/default/item/google/p DBus.Properties.Get string:'org.freedesktop.Secrets.Item' string:'Secret'
+
+dbus-send --print-reply  --dest=spark.pass /org/freedesktop/Secrets org.freedesktop.Secrets.Service.RetrieveSecrets array:string:"/org/freedesktop/Secrets/collection/default/google/p"
+
+### List all secrets
+dbus-send --print-reply  --dest=spark.pass /org/freedesktop/Secrets org.freedesktop.Secrets.Service.SearchCollections dict:string:string:'search','term'
