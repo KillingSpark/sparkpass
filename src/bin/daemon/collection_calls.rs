@@ -40,7 +40,7 @@ pub fn handle_collection_calls(
                             reply: vec![return_msg],
                         };
                         return Some(result);
-                    },
+                    }
                     "Locked" => {
                         return Some(MsgHandlerResult {
                             done: false,

@@ -214,7 +214,7 @@ impl Collection {
 
 fn run_default_coll() -> Result<(), dbus::Error> {
     let c = Connection::get_private(BusType::Session)?;
-    c.register_name("spark.pass", NameFlag::ReplaceExisting as u32)?;
+    c.register_name("com.github.killingspark.sparkpass", NameFlag::ReplaceExisting as u32)?;
 
     println!("Enter key for repo");
     let pass = rpassword::read_password().unwrap();
