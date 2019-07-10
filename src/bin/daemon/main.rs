@@ -9,7 +9,6 @@ use sparkpass::transform::{EncryptionParams, DEFAULT_IV};
 use sparkpass::util::{flatten_tree, get_tree_from_path, show_entry, TreeNode};
 
 use openssl::sha::sha256;
-use std::collections::HashMap;
 
 mod collection_calls;
 mod item_calls;
@@ -50,7 +49,14 @@ impl MsgHandler for Handler {
         println!("Object: {}", path.as_str());
 
         if !path.starts_with("/org/freedesktop/Secrets") {
-            panic!("invalid object path prefix");
+            return Some(MsgHandlerResult {
+                done: false,
+                handled: true,
+                reply: vec![MethodErr::failed(
+                    &"Object path must start with /org/freedesktop/Secrets",
+                )
+                .to_message(msg)],
+            });
         }
 
         let route: Vec<&str> = path.split("/").collect();
@@ -86,7 +92,10 @@ impl MsgHandler for Handler {
                     }
                 }
                 "session" => {
-                    return session_calls::handle_session_calls(interface.as_str(), member.as_str());
+                    return session_calls::handle_session_calls(
+                        interface.as_str(),
+                        member.as_str(),
+                    );
                 }
                 "collection" => {
                     if route.len() == 2 {
@@ -107,7 +116,16 @@ impl MsgHandler for Handler {
                         );
                     }
                 }
-                _ => panic!("unknown object"),
+                _ => {
+                    return Some(MsgHandlerResult {
+                        done: false,
+                        handled: true,
+                        reply: vec![MethodErr::failed(
+                            &"Object path not matching the specification",
+                        )
+                        .to_message(msg)],
+                    });
+                }
             }
         }
 
@@ -116,7 +134,7 @@ impl MsgHandler for Handler {
 }
 
 impl Collection {
-    fn handle_ls(&self) -> Vec<String> {
+    fn handle_ls(&self) -> Result<Vec<String>, MethodErr> {
         let key = match &self.key {
             None => {
                 panic!("No key given");
@@ -138,7 +156,7 @@ impl Collection {
             match get_tree_from_path(std::path::Path::new(full_path.as_str()), true, &enc_params) {
                 Ok(t) => t,
                 Err(e) => {
-                    panic!("Error reading entries: {}", e.to_string());
+                    return Err(MethodErr::failed(&format!("Error while reading entries: {}", e)));
                 }
             };
 
@@ -158,7 +176,7 @@ impl Collection {
             })
             .collect();
 
-        objectpath_list
+        Ok(objectpath_list)
     }
 
     fn handle_show(&self, name: &str) -> Result<String, Box<std::error::Error>> {
@@ -187,12 +205,6 @@ impl Collection {
                 panic!(e.as_str().to_owned());
             }
         }
-    }
-
-    fn handle_unlock(&mut self, msg: &Message) -> Result<Vec<Message>, MethodErr> {
-        let n: &str = msg.read1()?;
-        self.key = Some(Vec::from(n.as_bytes()));
-        Ok(vec![msg.method_return()])
     }
 }
 

@@ -1,4 +1,4 @@
-use dbus::{Message, MsgHandlerResult};
+use dbus::{tree::MethodErr, Message, MsgHandlerResult};
 
 pub fn handle_collection_calls(
     coll: &crate::Collection,
@@ -20,9 +20,10 @@ pub fn handle_collection_calls(
                 }
                 match propname.as_str() {
                     "Items" => {
-                        let return_msg = (*msg)
-                            .method_return()
-                            .append1(coll.handle_ls());
+                        let return_msg = match coll.handle_ls() {
+                            Ok(v) => (*msg).method_return().append1(v),
+                            Err(e) => e.to_message(msg),
+                        };
 
                         let result = MsgHandlerResult {
                             done: false,
@@ -32,26 +33,52 @@ pub fn handle_collection_calls(
                         };
                         return Some(result);
                     }
-                    _ => unimplemented!("Collection interface"),
+                    _ => {
+                        return Some(MsgHandlerResult {
+                            done: false,
+                            handled: true,
+                            reply: vec![MethodErr::failed(&"Collection interface not implemented")
+                                .to_message(msg)],
+                        })
+                    }
                 }
             }
             "Set" => {
-                let (iface, propname): (String, String) = msg.read2().unwrap();
-                println!("{}, {}", iface, propname);
-                unimplemented!("Setting collection properties");
+                let (_iface, _propname): (String, String) = msg.read2().unwrap();
+
+                return Some(MsgHandlerResult {
+                    done: false,
+                    handled: true,
+                    reply: vec![
+                        MethodErr::failed(&"Unimplemented: Setting collection properties")
+                            .to_message(msg),
+                    ],
+                });
             }
             "GetAll" => {
-                unimplemented!("GetAll for properties");
+                return Some(MsgHandlerResult {
+                    done: false,
+                    handled: true,
+                    reply: vec![
+                        MethodErr::failed(&"Getting list of properties for collection")
+                            .to_message(msg),
+                    ],
+                });
             }
             _ => {
-                panic!("Unknown command");
+                return Some(MsgHandlerResult {
+                    done: false,
+                    handled: true,
+                    reply: vec![MethodErr::failed(&"Unknown member").to_message(msg)],
+                });
             }
         },
         _ => {
-            panic!(
-                "Called default collection with wrong interface: {}",
-                interface
-            );
+            return Some(MsgHandlerResult {
+                done: false,
+                handled: true,
+                reply: vec![MethodErr::failed(&"Unsupported interface").to_message(msg)],
+            });
         }
     }
 }

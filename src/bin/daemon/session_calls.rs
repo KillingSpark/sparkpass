@@ -1,5 +1,5 @@
-use dbus::{Message, MsgHandlerResult};
-use std::collections::HashMap;
+use dbus::MsgHandlerResult;
+
 pub fn handle_session_calls(
     interface: &str,
     member: &str,
